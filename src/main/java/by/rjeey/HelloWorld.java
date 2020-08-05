@@ -1,6 +1,7 @@
 package by.rjeey;
 
 import com.github.javafaker.Faker;
+
 import java.util.*;
 
 public class HelloWorld {
@@ -20,33 +21,41 @@ public class HelloWorld {
             System.out.println("\nThe entered data is incorrect try checking by example (us, 1, 1) or (us, 1)");
             return;
         }
-        generate(records,mistakes, country).forEach(System.out::println);
+        generate(records, mistakes, country);
     }
 
-    static List<Data> generate(int countRecords, double mis, String local) {
+    static void generate(int countRecords, double mis, String local) {
         List<Data> records = new ArrayList<>();
         Faker faker = new Faker(new Locale(local));
-        int i = 0;
-        while (i < countRecords) {
-            records.add(new Data(faker.name().nameWithMiddle(),
-                    faker.address().fullAddress(), faker.phoneNumber().phoneNumber()));
-            ++i;
+        for (int i = 0; i < countRecords; ++i) {
+            FlyData.setFullName(faker.name().nameWithMiddle(), i);
+            FlyData.setAddress(faker.address().fullAddress(), i);
+            FlyData.setPhoneNumber(faker.phoneNumber().phoneNumber(), i);
         }
         if (mis != 0) {
             if (mis < 1) {
-                mis = (records.size() * mis);
-                double finalMis = mis;
+                mis = (countRecords * mis);
                 for (int j = 0; j < mis; ++j) {
-                    records.forEach(d -> d.Replacement(generateMisses(d, (int)finalMis, local)));
+                    switch ((int) (Math.random() * 3)) {
+                        case 1 -> FlyData.setFullName(generateMisses(FlyData.getFullName(j), (int) mis, local, 1), j);
+                        case 2 -> FlyData.setAddress(generateMisses(FlyData.getAddress(j), (int) mis, local, 2), j);
+                        case 3 -> FlyData.setPhoneNumber(generateMisses(FlyData.getPhoneNumber(j), (int) mis, local, 3), j);
+                    }
                 }
             }
-            double finalMisCount = mis;
-            records.forEach(d -> d.Replacement(generateMisses(d, (int)finalMisCount, local)));
+            for (int j = 0; j < mis; ++j) {
+                switch ((int) (Math.random() * 3)) {
+                    case 1 -> FlyData.setFullName(generateMisses(FlyData.getFullName(j), (int) mis, local, 1), j);
+                    case 2 -> FlyData.setAddress(generateMisses(FlyData.getAddress(j), (int) mis, local, 2), j);
+                    case 3 -> FlyData.setPhoneNumber(generateMisses(FlyData.getPhoneNumber(j), (int) mis, local, 3), j);
+                }
+            }
         }
-        return records;
+        for (int i=0; i< countRecords;++i)
+            System.out.println(FlyData.str(i));
     }
 
-    static Data generateMisses(Data data, int misses, String local) {
+    static String generateMisses(String data, int misses, String local, int num) {
         char letter;
         StringBuilder changer = new StringBuilder();
         char[] us = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
@@ -61,44 +70,30 @@ public class HelloWorld {
                 default -> throw new IllegalStateException("Unexpected value: " + local);
             };
             int number = (int) (Math.random() * 9);
-            switch ((int) (Math.random() * 3)) {
-                case 1 -> {
-                    changer.append(data.getFullName().trim());
-                    int ch = (int) (Math.random() * (changer.length()-1));
-                    if ((int) (Math.random() * 2) == 1) {
-                        changer.insert((int) (Math.random() * changer.length()), letter);
-                        changer.deleteCharAt((int) (Math.random() * changer.length()));
-                    } else {
-                        changer.setCharAt(ch, data.getFullName().charAt(ch+1));
-                        changer.setCharAt(ch + 1, data.getFullName().charAt(ch));
-                    }
-                    data.setFullName(changer.toString());
+            if (num == 1 || num == 2) {
+                changer.append(data.trim());
+                int ch = (int) (Math.random() * (changer.length() - 1));
+                if ((int) (Math.random() * 2) == 1) {
+                    changer.insert((int) (Math.random() * changer.length()), letter);
+                    changer.deleteCharAt((int) (Math.random() * changer.length()));
+                } else {
+                    changer.setCharAt(ch, data.charAt(ch + 1));
+                    changer.setCharAt(ch + 1, data.charAt(ch));
                 }
-                case 2 -> {
-                    changer.append(data.getAddress().trim());
-                    int ch = (int) (Math.random() * (changer.length()-1));
-                    if ((int) (Math.random() * 2) == 1) {
-                        changer.insert((int) (Math.random() * changer.length()), letter);
-                        changer.deleteCharAt((int) (Math.random() * changer.length()));
-                    } else {
-                        changer.setCharAt(ch, data.getAddress().charAt(ch));
-                        changer.setCharAt(ch + 1, data.getAddress().charAt(ch + 1));
-                    }
-                    data.setAddress(changer.toString());
+                data = changer.toString();
+            } else {
+                changer.append(data.trim());
+                int ch = (int) (Math.random() * (changer.length() - 1));
+                if ((int) (Math.random() * 2) == 1) {
+                    changer.insert((int) (Math.random() * changer.length()), (char) (number + '0'));
+                    changer.deleteCharAt((int) (Math.random() * changer.length()));
+                } else {
+                    changer.setCharAt(ch, data.charAt(ch));
+                    changer.setCharAt(ch + 1, data.charAt(ch + 1));
                 }
-                case 3 -> {
-                    changer.append(data.getPhoneNumber().trim());
-                    int ch = (int) (Math.random() * (changer.length()-1));
-                    if ((int) (Math.random() * 2) == 1) {
-                        changer.insert((int) (Math.random() * changer.length()), (char) (number + '0'));
-                        changer.deleteCharAt((int) (Math.random() * changer.length()));
-                    } else {
-                        changer.setCharAt(ch, data.getPhoneNumber().charAt(ch));
-                        changer.setCharAt(ch + 1, data.getPhoneNumber().charAt(ch + 1));
-                    }
-                    data.setPhoneNumber(changer.toString());
-                }
+                data = changer.toString();
             }
+
         }
         return data;
     }
