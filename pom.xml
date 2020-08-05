@@ -54,7 +54,7 @@
                         <addClasspath>true</addClasspath>
                         <classpathPrefix>jars/</classpathPrefix>
                         <classpathLayoutType>simple</classpathLayoutType>
-                        <mainClass>by.rjeey.HelloWorld</mainClass>
+                        <mainClass>by.rjeey.Generator</mainClass>
                     </manifest>
                 </archive>
             </configuration>
